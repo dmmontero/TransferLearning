@@ -54,5 +54,5 @@ class Model:
         predictions = [{"class": res[1], "score": float(res[2])} for res in results]
         return JSONResponse(content={"predictions": predictions})
 
-        def __init__(self):
-            pass
+    def __init__(self):
+        pass

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from typing import Annotated
-from source.model import Model as Model
+from source.model_predictor import ModelPredictor as ModelPredictor
 
 app = FastAPI(
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
@@ -56,10 +56,16 @@ async def create_upload_file(file: UploadFile):
     return {"filename": file.filename}
 
 
-@app.post("/predict/")
-async def predict(uploaded_file: UploadFile = File(...)):
-    _model = Model()
-    return await _model.predict(uploaded_file)
+@app.post("/image_predict/")
+async def image_predict(uploaded_file: UploadFile = File(...)):
+    _model = ModelPredictor()
+    return await _model.predictRestNet(uploaded_file)
+
+
+@app.post("/image_features/")
+async def image_features(uploaded_file: UploadFile = File(...)):
+    _model = ModelPredictor()
+    return await _model.predictVGG16(uploaded_file)
 
 
 # # Custom Swagger UI HTML template
