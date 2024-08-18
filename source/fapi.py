@@ -68,6 +68,12 @@ async def image_features(uploaded_file: UploadFile = File(...)):
     return await _model.predictVGG16(uploaded_file)
 
 
+@app.post("/flower_predict/")
+async def flower_predict(uploaded_file: UploadFile = File(...)):
+    _model = ModelPredictor()
+    return await _model.predictRestNetTF(uploaded_file)
+
+
 # # Custom Swagger UI HTML template
 # def custom_swagger_ui_html(*args, **kwargs):
 #     html = get_swagger_ui_html(*args, **kwargs)

@@ -1,3 +1,5 @@
+import tensorflow as tf
+from tensorflow import keras
 import numpy as np
 from keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
 from keras.applications.vgg16 import VGG16, decode_predictions as decode_predictionsVGG
@@ -7,26 +9,32 @@ import io
 from fastapi.responses import JSONResponse
 
 
+tf.compat.v1.disable_eager_execution()
+tf.compat.v1.experimental.output_all_intermediates(True)
+
+
 class ModelPredictor(object):
     """docstring for ClassName."""
 
-    _modelRestNet = None
+    CLASS_NAMES = ["daisy", "dandelion", "roses", "sunflowers", "tulips"]
+    _modelResNet = None
     _modelVGG16 = None
+    _modelResNetTransfer = None
 
     def __init__(self):
         super(ModelPredictor, self).__init__()
 
     @classmethod
-    def get_model_restnet(cls):
+    def get_model_resnet(cls):
         """
         Gets the ResNet50 model with pre-trained weights from the ImageNet dataset.
 
         Returns:
             keras.models.Model: The ResNet50 model.
         """
-        if cls._modelRestNet is None:
-            cls._modelRestNet = ResNet50(weights="imagenet")
-        return cls._modelRestNet
+        if cls._modelResNet is None:
+            cls._modelResNet = ResNet50(weights="imagenet")
+        return cls._modelResNet
 
     @classmethod
     def get_model_vgg16(cls):
@@ -41,15 +49,38 @@ class ModelPredictor(object):
         return cls._modelVGG16
 
     @classmethod
+    def get_model_resnet_transfer(cls):
+        """
+        Gets the ResNet50 model with pre-trained weights from the ImageNet dataset.
+
+        Returns:
+            keras.models.Model: The ResNet50 model.
+        """
+        if cls._modelResNetTransfer is None:
+            cls._modelResNetTransfer = keras.models.load_model("./models/RESNET50.h5")
+        return cls._modelResNetTransfer
+
+    @classmethod
     async def predictRestNet(self, file):
         # Leer la imagen subida
         img_array = await self.process_image(file)
         # Hacer la predicción
-        preds = self.get_model_restnet().predict(img_array)
+        preds = self.get_model_resnet().predict(img_array)
         results = decode_predictions(preds, top=3)[0]
         # Formatear los resultados
         predictions = [{"class": res[1], "score": float(res[2])} for res in results]
         return JSONResponse(content={"predictions": predictions})
+
+    @classmethod
+    async def predictRestNetTF(self, file):
+        print("version TensorFlow: ", tf.__version__)
+        # Leer la imagen subida
+        img_array = await self.process_image(file)
+        # Hacer la predicción
+        preds = self.get_model_resnet_transfer().predict(img_array)
+        # Formatear los resultados
+        image_output_classr = self.__class__.CLASS_NAMES[np.argmax(preds)]
+        return JSONResponse(content={"prediction": image_output_classr})
 
     @classmethod
     async def predictVGG16(self, file):
