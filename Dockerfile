@@ -1,5 +1,5 @@
-# For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3-slim
+# Pyrhon Dockerfile version 3.11.9 
+FROM python:3.11.9
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -7,36 +7,21 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
+# Wor dir for app 
+WORKDIR /code
+
 # Install pip requirements
-COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
+COPY ./requirements.txt /code/requirements.txt
 
-WORKDIR /app
-COPY . /app
+# Install reequired packages
+# RUN python -m pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install "fastapi[standard]"
+# Copy project in workdir folder
+COPY . /code/app
 
-# Creates a non-root user with an explicit UID and adds permission to access the /app folder
-# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
-USER appuser
+# Expose the port on which the application will run
+EXPOSE 8282
 
-# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "main.py"]
-
-
-# Usa una imagen base de Python
-# FROM python:3.9-slim
-
-# # Instala las dependencias
-# RUN pip install grpcio grpcio-tools numpy keras
-
-# # Copia los archivos del proyecto
-# COPY . /app
-
-# # Establece el directorio de trabajo
-# WORKDIR /app
-
-# # Expone el puerto del servidor gRPC
-# EXPOSE 50051
-
-# # Comando para ejecutar el servidor gRPC
-# CMD ["python", "server.py"]
+# Run app
+CMD ["fastapi", "run", "app/main.py","--host", "0.0.0.0", "--port", "8282"]
