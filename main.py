@@ -1,11 +1,18 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.logger import logger as fastapi_logger
 from .source.model_predictor import ModelPredictor as ModelPredictor
+import logging
 
 app = FastAPI(
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
     title="API for Keras CV models",
     description="DESARROLLO DE PROYECTOS DE INTELIGENCIA ARTIFICIAL-HL - 1HL - (2024-24)",
 )
+
+
+logger = logging.getLogger("gunicorn.error")
+fastapi_logger.handlers = logger.handlers
+fastapi_logger.setLevel(logger.level)
 
 
 @app.post("/image_predict/")

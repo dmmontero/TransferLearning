@@ -14,7 +14,7 @@ tf.compat.v1.experimental.output_all_intermediates(True)
 
 
 class ModelPredictor(object):
-    """docstring for ClassName."""
+    """Clase usada para caragar los modelos y realizar predicciones"""
 
     CLASS_NAMES = ["daisy", "dandelion", "roses", "sunflowers", "tulips"]
     _modelResNet = None
@@ -57,7 +57,9 @@ class ModelPredictor(object):
             keras.models.Model: The ResNet50 model.
         """
         if cls._modelResNetTransfer is None:
-            cls._modelResNetTransfer = keras.models.load_model("./models/RESNET50.h5")
+            cls._modelResNetTransfer = tf.keras.models.load_model(
+                "./models/RESNET50.h5"
+            )
         return cls._modelResNetTransfer
 
     @classmethod
@@ -73,13 +75,12 @@ class ModelPredictor(object):
 
     @classmethod
     async def predictRestNetTF(self, file):
-        print("version TensorFlow: ", tf.__version__)
         # Leer la imagen subida
         img_array = await self.process_image(file)
         # Hacer la predicción
         preds = self.get_model_resnet_transfer().predict(img_array)
         # Formatear los resultados
-        image_output_classr = self.__class__.CLASS_NAMES[np.argmax(preds)]
+        image_output_classr = self.CLASS_NAMES[np.argmax(preds)]
         return JSONResponse(content={"prediction": image_output_classr})
 
     @classmethod
@@ -89,7 +90,7 @@ class ModelPredictor(object):
         # extraer features de la imagen
         preds = self.get_model_vgg16().predict(img_array)
         # Let's predict top 5 results
-        results = decode_predictionsVGG(preds, top=5)[0]
+        results = decode_predictionsVGG(preds, top=3)[0]
         predictions = [{"class": res[1], "score": float(res[2])} for res in results]
         return JSONResponse(content={"predictions": predictions})
 
