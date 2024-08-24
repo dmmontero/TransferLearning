@@ -2,11 +2,7 @@
 
 ResNet50 es una arquitectura de red neuronal profunda que ha sido preentrenada en el conjunto de datos ImageNet, que contiene millones de imágenes clasificadas en miles de categorías. Utilizar ResNet50 para transfer learning implica reutilizar esta red preentrenada y ajustarla para una nueva tarea de clasificación de imágenes.
 
-<https://medium.com/@t.mostafid/overview-of-vgg16-xception-mobilenet-and-resnet50-neural-networks-c678e0c0ee85>
-
-<https://www.gopichandrakesan.com/day-34-predict-an-image-using-vgg16-pretrained-model/>
-
-Para ejercicio de **Transfer Learnign** se entrenó un modelo ResNet50 para el reconocimiento de flores, el modelo
+Para el ejercicio de **Transfer Learnign** se entrenó un modelo ResNet50 para el reconocimiento de flores, el modelo
 resultante debe copiarse a la carpeta models del projecto, dicho modelo puede descargarlo aquí:
 
 <https://drive.google.com/drive/folders/1g3amN3YfFOOsHX9fFsWsvK-RTdB6WXuE?usp=sharing>
@@ -17,7 +13,7 @@ Y se generó un Jupyer Book para la generación del modelo el cual puede descara
 
 Adicionalmente hay una copia del book en la carpeta models: **kerascv.ipynb**
 
-## Nota El modelo debe estar presente en la carpeta models para hacer uso de la opción, este no se sube a GitHub por el tamaño para el ejercicio estamo usado el formato h5
+## Nota El modelo debe estar presente en la carpeta models para hacer uso de la opción, este no se sube a GitHub por el tamaño, para el ejercicio estamo usado el formato h5
 
 ---
 
@@ -36,7 +32,7 @@ Requerimientos necesarios para el funcionamiento:
    _conda create -n ResNet50 python=3.11_
 
 2. Activar el ambiente virtual creado:\
-   _conda activate neumonia_
+   _conda activate ResNet50_
 
 3. Ir a la carpeta del proyecto:\
    _cd TransFerLearning_
@@ -47,13 +43,15 @@ Requerimientos necesarios para el funcionamiento:
 5. Ejecutar el proyecto en modo developer, este comando le permite ver la api en la maquina de desarrollo:\
    _fastapi dev .\main.py_
 
-6. Una vez ejecutado el comando podra ver los endpoint de la api con Swagger en <http://localhost:8080/docs> 8080 es el puerto por defecto sidese mosdifcarlo debe enviar el parametro **--port #puerto**
+6. Una vez ejecutado el comando podra ver los endpoint de la api con Swagger en <http://localhost:8080/docs> 8080 es el puerto por defecto si deseas mosdifcarlo debe enviar el parametro **--port #puerto**
+
+---
 
 ## Uso de la api Gráfica
 
-La api cuenta con 3 endpoints:
+La api cuenta con 3 Endpoints:
 
-1. /image_predict (Post): Este endpoint permite el reconocimiento de una imagen RGB (JPG, PNG, GIF, TIFF, RAW) usando el modelo **ResNet50**, el enpoint permite la carga de imágenes y retorna una respuesta JSON con las 3 primeras predicciones con al clase y score
+1. **/image_predict (Post)**: Este endpoint permite el reconocimiento de una imágen RGB (JPG, PNG, GIF, TIFF, RAW) usando el modelo **ResNet50**, el endpoint permite la carga de imágenes y retorna una respuesta JSON con las 3 primeras predicciones con al clase y score
    {
    "predictions": [
    {
@@ -71,7 +69,7 @@ La api cuenta con 3 endpoints:
    ]
    }
 
-2. /image_features (Post): Este endpoint permite el reconocimiento de una imagen RGB (JPG, PNG, GIF, TIFF, RAW) usando el modelo **VGG16**, el enpoint permite la carga de imagenes y retorna una respuesta JSON con las 3 primeras predicciones con al clase y score
+2. **/image_features (Post)**: Este Endpoint permite el reconocimiento de una imágen RGB (JPG, PNG, GIF, TIFF, RAW) usando el modelo **VGG16**, el endpoint permite la carga de imágenes y retorna una respuesta JSON con las 3 primeras predicciones con al clase y score
    {
    "predictions": [
    {
@@ -88,18 +86,20 @@ La api cuenta con 3 endpoints:
    }
    ]
    }
-3. /flower_predict (Post): Este endpotin muestra un ejemplo de **Transfer Leraning**, para este ednpoint se entrenó un modelo **ResNet50** para el reconocieminto de imágenes de flores, espeficicamente (5 clases) **['daisy', 'dandelion', 'roses', 'sunflowers', 'tulips']**
+3. **/flower_predict (Post)**: Este Endpoint muestra un ejemplo de **Transfer Leraning**, para este endpoint se entrenó un modelo **ResNet50** para el reconocimiento de imágenes de flores, espeficicamente (5 clases) **['daisy', 'dandelion', 'roses', 'sunflowers', 'tulips']**
+
+---
 
 ## Imágen Docker
 
-El proyecto puede se ejecutado desde una Imagen Docker, para ello debe ejecutar los siguientes pasos:
+El proyecto puede se ejecutado desde una Imágen Docker, para ello debe ejecutar los siguientes pasos:
 
-1. Crear la imagen Docker:
-   Una vez se encuentre en la raiz del proyecto ejecuta el siguiente comando para crear la imágen
+1. **Crear la imágen Docker:**
+   Una vez se encuentre en la raíz del proyecto ejecuta el siguiente comando para crear la imágen
 
    **docker build -t transfer_learning .**
 
-2. Ejecutar la imagen Docker:
+2. **Ejecutar la imagen Docker:**
    Este comando corre la Api en el puerto 8282 sientase en libertad de cambiar si lo desea
    **docker run -d --name transfer_learning_container -p 8282:8282 transfer_learning**
 
@@ -109,52 +109,33 @@ El proyecto puede se ejecutado desde una Imagen Docker, para ello debe ejecutar 
 
 ## Arquitectura de archivos propuesta
 
-Los archivos se encuentra dentro de la carpeta **src** a excepcion del _detector_neumonia.py_
-que es el punto de entra de la app y se encuenta en la raíz del proyecto.
+### main.py
 
-## detector_neumonia.py
+Script que contiene el punto de entrada de la aplicación, este archivo contiene la definición de la API en **Fast API**
 
-Contiene el diseño de la interfaz gráfica utilizando Tkinter.
+### source/model_predictor.py
 
-Los botones llaman métodos contenidos en otros scripts.
+Script que invoca las predicciones en los diferentes modelos y carga el modelo entrenado **(models/RESNET50.h5)** para el reconocimiento de flores.
 
-## integrator.py
+### models/RESNET50.h5
 
-Es un módulo que integra los demás scripts y retorna solamente lo necesario para ser visualizado en la interfaz gráfica.
-Retorna la clase, la probabilidad y una imagen el mapa de calor generado por Grad-CAM.
+Archivo binario del modelo de red neuronal convolucional previamente entrenado para el reconocimiento de flores mediante Transfer Leraning usando el modelo ResNet50.h5, este modelo se puede descargar de:
 
-## read_img.py
+<https://colab.research.google.com/gist/dmmontero/13b855c09b966f9d572cfa7648e984fc/kerascv.ipynb>
 
-Script que lee la imagen en formato DICOM para visualizarla en la interfaz gráfica. Además, la convierte a arreglo para su preprocesamiento.
+o se puede generar usando el Jupyter Book ubicado en **models/KerasCV.ipynb**
 
-## preprocess_img.py
+### models/KerasCV.ipynb
 
-Script que recibe el arreglo proveniento de read_img.py, realiza las siguientes modificaciones:
-
-- resize a 512x512
-- conversión a escala de grises
-- ecualización del histograma con CLAHE
-- normalización de la imagen entre 0 y 1
-- conversión del arreglo de imagen a formato de batch (tensor)
-
-## load_model.py
-
-Script que lee el archivo binario del modelo de red neuronal convolucional previamente entrenado llamado **'conv_MLP_84.h5.h5'**.
-el cual debe cargarse a la carpeta modelos y se puede descaragar aqui:
-
-**<https://drive.google.com/file/d/18rgX66x7eMHci0bAimoycCe8BQLjBWK_/view?usp=sharing>**
-
-## grad_cam.py
-
-Script que recibe la imagen y la procesa, carga el modelo, obtiene la predicción y la capa convolucional de interés para obtener las características relevantes de la imagen.
+Jupyter Book que tiene el código para generar el modelo, este se corrió en Google Colab, sientase en libertad de cambair los parámetros de entrenamiento.
 
 ---
 
 ## Acerca del Modelo
 
-**ResNet-50** es una red neuronal convolucional con 50 capas de profundidad. Puede cargar una versión preentrenada de la red neuronal entrenada con más de un millón de imágenes desde la base de datos [1] de ImageNet. La red neuronal preentrenada puede clasificar imágenes en 1000 categorías de objetos (por ejemplo, teclado, ratón, lápiz y muchos animales). Como resultado, la red neuronal ha aprendido representaciones ricas en características para una amplia gama de imágenes. El tamaño de la entrada de imagen de la red neuronal es de 224 por 224.
+**ResNet-50** es una red neuronal convolucional con 50 capas de profundidad. Puede cargar una versión preentrenada de la red neuronal entrenada con más de un millón de imágenes desde la base de datos de ImageNet. La red neuronal preentrenada puede clasificar imágenes en 1000 categorías de objetos (por ejemplo, teclado, ratón, lápiz y muchos animales). Como resultado, la red neuronal ha aprendido representaciones ricas en características para una amplia gama de imágenes. El tamaño de la entrada de imagen de la red neuronal es de 224 por 224.
 
-**VGG-16** es una red neuronal convolucional con 16 capas de profundidad. Puede cargar una versión preentrenada de la red entrenada en más de un millón de imágenes desde la base de datos [1] de ImageNet. La red preentrenada puede clasificar imágenes en 1000 categorías de objetos (por ejemplo, teclado, ratón, lápiz y muchos animales). Como resultado, la red ha aprendido representaciones ricas en características para una amplia gama de imágenes. El tamaño de la entrada de imagen de la red es de 224 por 224.
+**VGG-16** es una red neuronal convolucional con 16 capas de profundidad. Puede cargar una versión preentrenada de la red entrenada en más de un millón de imágenes desde la base de datos de ImageNet. La red preentrenada puede clasificar imágenes en 1000 categorías de objetos (por ejemplo, teclado, ratón, lápiz y muchos animales). Como resultado, la red ha aprendido representaciones ricas en características para una amplia gama de imágenes. El tamaño de la entrada de imagen de la red es de 224 por 224.
 
 **Transfer Learning** o aprendizaje transferido en español, se refiere al conjunto de métodos que permiten transferir conocimientos adquiridos gracias a la resolución de problemas para resolver otros problemas.
 
@@ -164,11 +145,11 @@ Script que recibe la imagen y la procesa, carga el modelo, obtiene la predicció
 
 ## Test Cases
 
-En la carpeta **test** del proyecto se encuentra los casos de prueba creados con **unittest** para ejecutar un caso de prueba específico ejecute el siguiente comando:
+En la carpeta **test** del proyecto se encuentran los casos de prueba creados con **unittest** para ejecutar un caso de prueba específico ejecute el siguiente comando, las clases usadas se cargaron de la carpeta **test/pics** sientase en libertad de usar otras imágenes
 
-**_python -m unittest discover .\test test_load_model.py_**
+**_python -m unittest discover .\test test_model_predictor.py_**
 
-Donde _test_load_model.py_ en el archivo que contiene la prueba este comando ejectar todas las pruebas creadas.
+Donde **test_model_predictor.py.py** es el archivo que contiene la prueba, este comando ejecutar todas las pruebas creadas.
 
 ---
 
